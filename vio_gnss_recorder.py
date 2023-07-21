@@ -35,7 +35,7 @@ mountpoint = input("Specify the used mountpoint: ")
 
 # Validate correct format for coordinates, accept '.' and '-'
 while True:
-    wrongFormat = "Wrong format. Try again using the correct format, like this: 60.2 24.8:"
+    wrongFormat = "Wrong format. Try again using the correct format, like this: 60.2 24.8"
     try:
         lat, lon = input("Type the coordinates of your current location in format 'LAT LON' (use . as a decimal separator):\n").split()
         if not float(lat) and not float(lon):
