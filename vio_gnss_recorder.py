@@ -22,12 +22,13 @@ print("\nYou are logged in as " + getpass.getuser() + "\n")
 YELLOW = '\033[93m'
 END = '\033[0m'
 
-# 'Define' the absolute paths of the directories this script depends on, also show a warning if paths aren't configured
+# 'Define' the absolute paths of the directories this script depends on, also show a warning if paths aren't configured. Device is also defined.
 configuration = configparser.ConfigParser()
 configuration.read("config.ini")
 U_BLOX_CAPTURE_PATH = configuration['Filepaths']['u-blox-capture']
 SDK_EXAMPLES_PATH = configuration['Filepaths']['sdk-examples']
-if U_BLOX_CAPTURE_PATH is "" or SDK_EXAMPLES_PATH is "":
+DEVICE_PATH = configuration["Filepaths"]['device-path']
+if U_BLOX_CAPTURE_PATH is "" or SDK_EXAMPLES_PATH is "" or DEVICE_PATH is "":
     print(YELLOW + "WARNING: Necessary filepaths aren't configured in config.ini\n" + END)
 
 ### Ask credentials, mountpoint address, rough coordinates...
@@ -52,4 +53,4 @@ while True:
         continue
     else:
         break
-
+    
