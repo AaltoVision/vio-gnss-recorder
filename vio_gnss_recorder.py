@@ -15,14 +15,20 @@ import readline
 
 import configparser
 
-# 'Define' the absolute paths of the directories this script depends on
+# Is the user logged in as sudo?
+print("\nYou are logged in as " + getpass.getuser() + "\n")
+
+# 'Define' colors to make output easier to read
+YELLOW = '\033[93m'
+END = '\033[0m'
+
+# 'Define' the absolute paths of the directories this script depends on, also show a warning if paths aren't configured
 configuration = configparser.ConfigParser()
 configuration.read("config.ini")
 U_BLOX_CAPTURE_PATH = configuration['Filepaths']['u-blox-capture']
 SDK_EXAMPLES_PATH = configuration['Filepaths']['sdk-examples']
-
-# Is the user logged in as sudo?
-print("\nYou are logged in as " + getpass.getuser() + "\n")
+if U_BLOX_CAPTURE_PATH is "" or SDK_EXAMPLES_PATH is "":
+    print(YELLOW + "WARNING: Necessary filepaths aren't configured in config.ini\n" + END)
 
 ### Ask credentials, mountpoint address, rough coordinates...
 print("Your RTK providers credentials:")
@@ -35,10 +41,10 @@ mountpoint = input("Specify the used mountpoint: ")
 
 # Validate correct format for coordinates, accept '.' and '-'
 while True:
-    wrongFormat = "Wrong format. Try again using the correct format, like this: 60.2 24.8"
+    wrongFormat = YELLOW+"Wrong format. Try again using the correct format, like this: 60.2 24.8"+END
     try:
         lat, lon = input("Type the coordinates of your current location in format 'LAT LON' (use . as a decimal separator):\n").split()
-        if not float(lat) and not float(lon):
+        if not float(lat) or not float(lon):
             print(wrongFormat)
             continue
     except ValueError:
