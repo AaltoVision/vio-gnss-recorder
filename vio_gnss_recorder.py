@@ -18,12 +18,13 @@ from datetime import datetime
 
 import configparser
 
-# 'Define' colors to make output easier to read
+# 'Define' colors and styles to make output easier to read
 YELLOW = '\033[93m'
+BOLD = '\033[1m'
 END = '\033[0m'
 
 # Is the user logged in as sudo?
-print("\nYou are logged in as " + getpass.getuser())
+print("\nYou are logged in as " + BOLD + getpass.getuser() + END)
 # The module should be configured prior to running this script
 print(YELLOW + "The module (u-blox C099-F9P) should be configured prior to running this script.\n" + END)
 
@@ -39,7 +40,7 @@ if U_BLOX_CAPTURE_PATH is "" or SDK_EXAMPLES_PATH is "" or DEVICE_PATH is "":
     print(YELLOW + "WARNING: Necessary filepaths aren't configured in config.ini\n" + END)
 
 ### Ask credentials, mountpoint address, rough coordinates...
-print("Your RTK providers credentials:")
+print("Your RTK provider's credentials:")
 user = input("Username: ")
 password = getpass.getpass()
 print("\n")
@@ -60,13 +61,14 @@ while True:
         continue
     else:
         break
+print("\n")
 
 # Run str2str in the background to pipe RTK signal to the module
 STR2STR = shlex.split \
 (f"{U_BLOX_CAPTURE_PATH}/RTKLIB/app/str2str/gcc/str2str -in ntrip://{user}:{password}@{address}:{port}/{mountpoint} \
   -p {lat} {lon} 0.0 -n 250 -out serial://{DEVICE}:460800:8:n:1 &")
 
-subprocess.run(STR2STR)
+subprocess.run(STR2STR, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # We don't need the output
 
 # Run SpectacularAI's script vio_gnss.py piping the module's coordinates into it. Session is recorded to current folder
 timestamp = datetime.now().strftime('%d-%m-%y_%H:%M')
