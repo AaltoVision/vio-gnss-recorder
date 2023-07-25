@@ -13,6 +13,8 @@ Running the script requires an internet connnection for RTK's correction data an
 import getpass
 import readline
 import shlex
+import subprocess
+from datetime import datetime
 
 import configparser
 
@@ -31,6 +33,8 @@ configuration.read("config.ini")
 U_BLOX_CAPTURE_PATH = configuration['Filepaths']['u-blox-capture']
 SDK_EXAMPLES_PATH = configuration['Filepaths']['sdk-examples']
 DEVICE_PATH = configuration["Filepaths"]['device-path']
+DEVICE = DEVICE_PATH.split('/')[-1]
+    
 if U_BLOX_CAPTURE_PATH is "" or SDK_EXAMPLES_PATH is "" or DEVICE_PATH is "":
     print(YELLOW + "WARNING: Necessary filepaths aren't configured in config.ini\n" + END)
 
@@ -57,3 +61,16 @@ while True:
     else:
         break
 
+# Run str2str in the background to pipe RTK signal to the module
+STR2STR = shlex.split \
+(f"{U_BLOX_CAPTURE_PATH}/RTKLIB/app/str2str/gcc/str2str -in ntrip://{user}:{password}@{address}:{port}/{mountpoint} \
+  -p {lat} {lon} 0.0 -n 250 -out serial://{DEVICE}:460800:8:n:1 &")
+
+subprocess.run(STR2STR)
+
+# Run SpectacularAI's script vio_gnss.py piping the module's coordinates into it. Session is recorded to current folder
+timestamp = datetime.now().strftime('%d-%m-%y_%H:%M')
+VIO_GNSS = shlex.split \
+(f"python {U_BLOX_CAPTURE_PATH}/ubx_stdout.py {DEVICE_PATH} --json -fixStatus | python {SDK_EXAMPLES_PATH}/vio_gnss.py ./session_{timestamp}/")
+
+subprocess.run(VIO_GNSS)
