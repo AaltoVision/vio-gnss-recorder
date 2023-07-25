@@ -12,15 +12,18 @@ Running the script requires an internet connnection for RTK's correction data an
 
 import getpass
 import readline
+import shlex
 
 import configparser
-
-# Is the user logged in as sudo?
-print("\nYou are logged in as " + getpass.getuser() + "\n")
 
 # 'Define' colors to make output easier to read
 YELLOW = '\033[93m'
 END = '\033[0m'
+
+# Is the user logged in as sudo?
+print("\nYou are logged in as " + getpass.getuser())
+# The module should be configured prior to running this script
+print(YELLOW + "The module (u-blox C099-F9P) should be configured prior to running this script.\n" + END)
 
 # 'Define' the absolute paths of the directories this script depends on, also show a warning if paths aren't configured. Device is also defined.
 configuration = configparser.ConfigParser()
@@ -53,4 +56,4 @@ while True:
         continue
     else:
         break
-    
+
