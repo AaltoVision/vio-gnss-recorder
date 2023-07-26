@@ -36,7 +36,7 @@ SDK_EXAMPLES_PATH = configuration['Filepaths']['sdk-examples']
 DEVICE_PATH = configuration["Filepaths"]['device-path']
 DEVICE = DEVICE_PATH.split('/')[-1]
     
-if U_BLOX_CAPTURE_PATH is "" or SDK_EXAMPLES_PATH is "" or DEVICE_PATH is "":
+if U_BLOX_CAPTURE_PATH == "" or SDK_EXAMPLES_PATH == "" or DEVICE_PATH == "":
     print(YELLOW + "WARNING: Necessary filepaths aren't configured in config.ini\n" + END)
 
 ### Ask credentials, mountpoint address, rough coordinates...
@@ -63,16 +63,27 @@ while True:
         break
 print("\n")
 
-# Run str2str in the background to pipe RTK signal to the module
+
+### Run str2str in the background to pipe RTK signal to the module
 STR2STR = shlex.split \
 (f"{U_BLOX_CAPTURE_PATH}/RTKLIB/app/str2str/gcc/str2str -in ntrip://{user}:{password}@{address}:{port}/{mountpoint} \
   -p {lat} {lon} 0.0 -n 250 -out serial://{DEVICE}:460800:8:n:1 &")
 
 subprocess.run(STR2STR, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # We don't need the output
 
-# Run SpectacularAI's script vio_gnss.py piping the module's coordinates into it. Session is recorded to current folder
-timestamp = datetime.now().strftime('%d-%m-%y_%H:%M')
-VIO_GNSS = shlex.split \
-(f"python {U_BLOX_CAPTURE_PATH}/ubx_stdout.py {DEVICE_PATH} --json -fixStatus | python {SDK_EXAMPLES_PATH}/vio_gnss.py ./session_{timestamp}/")
 
-subprocess.run(VIO_GNSS)
+### Run SpectacularAI's script vio_gnss.py piping the module's coordinates into it. Session is recorded to current folder
+
+# To build the pipe, the commands are separated and the pipe is achieved via subprocess module
+
+VIO_GNSS1 = shlex.split \
+(f"python {U_BLOX_CAPTURE_PATH}/ubx_stdout.py {DEVICE_PATH} --json --fixStatus")
+# VIO_GNSS1 = shlex.split("python ./sample_ubx_stdout.py")  # portrays ubx_stdout.py for debugging
+
+timestamp = datetime.now().strftime('%d-%m-%y_%H:%M') # timestamp for recording folder
+VIO_GNSS2 = shlex.split \
+(f"python {SDK_EXAMPLES_PATH}/python/oak/vio_gnss.py ./session_{timestamp}/")
+
+# run ubx_stdout.py and pipe its output to vio_gnss.py
+ubx_stdout = subprocess.Popen(VIO_GNSS1, stdout=subprocess.PIPE, text=True)
+subprocess.run(VIO_GNSS2, stdin=ubx_stdout.stdout)
