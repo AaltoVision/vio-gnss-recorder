@@ -15,6 +15,7 @@ import readline
 import shlex
 import subprocess
 from datetime import datetime
+import sys
 
 import configparser
 
@@ -63,13 +64,23 @@ while True:
         break
 print("\n")
 
+### Check if coords.txt already exists and confirm possible overwrite
+try:
+    with open('coords.txt', 'x') as f:
+        pass
+except FileExistsError:
+    while True:
+        ans = input(YELLOW + "File coords.txt already exists. " + END + "Do you want to overwrite it? [y/n]\n")
+        if ans.lower() == 'y': break
+        elif ans.lower() == 'n': print("Exiting program..."); exit(0)
+        else: print("Invalid syntax, try again")
 
 ### Run str2str in the background to pipe RTK signal to the module
 STR2STR = shlex.split \
 (f"{U_BLOX_CAPTURE_PATH}/RTKLIB/app/str2str/gcc/str2str -in ntrip://{user}:{password}@{address}:{port}/{mountpoint} \
   -p {lat} {lon} 0.0 -n 250 -out serial://{DEVICE}:460800:8:n:1 &")
 
-subprocess.run(STR2STR, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # We don't need the output
+subprocess.Popen(STR2STR, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT) # We don't need the output
 
 
 ### Run SpectacularAI's script vio_gnss.py piping the module's coordinates into it. Session is recorded to current folder
@@ -84,6 +95,11 @@ timestamp = datetime.now().strftime('%d-%m-%y_%H:%M') # timestamp for recording 
 VIO_GNSS2 = shlex.split \
 (f"python {SDK_EXAMPLES_PATH}/python/oak/vio_gnss.py ./session_{timestamp}/")
 
-# run ubx_stdout.py and pipe its output to vio_gnss.py
-ubx_stdout = subprocess.Popen(VIO_GNSS1, stdout=subprocess.PIPE, text=True)
-subprocess.run(VIO_GNSS2, stdin=ubx_stdout.stdout)
+# ubx_stdout.py --> vio_gnss.py --> coords.txt
+with open('coords.txt', 'w') as f:
+    ubx_stdout = subprocess.Popen(VIO_GNSS1, stdout=subprocess.PIPE, text=True)
+    with subprocess.Popen(VIO_GNSS2, stdin=ubx_stdout.stdout, stdout=subprocess.PIPE, universal_newlines=True) as p:
+        for line in p.stdout:
+            #line.decode('utf-8')
+            sys.stdout.write(line)
+            f.write(line)
