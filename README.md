@@ -4,3 +4,6 @@ Automatisation of [SpectacularAI's GNSS + VIO demo](https://github.com/Spectacul
 ## Map
 * A map showing the travelled route is created
 * The map indicates the state of the RTK solution (None, Float, Fix) with colored dots
+
+Like this:                                 
+[<img src="/map_test.png" width="400"/>](/map_test.png)
