@@ -44,21 +44,22 @@ with open("coords.txt") as file:
 context = staticmaps.Context()
 context.set_tile_provider(staticmaps.tile_provider_OSM)
 
-for point in coords:
+# vio_gnss.py outputs data points so frequently that we can pick every 100th for map markers
+for point in coords[::100]:
 
     location = staticmaps.create_latlng(point[0], point[1])   # Create LatLng object (coordinate point)
 
     # Set color for marker according to RTK state
     match point[2]:
         case 'None':
-            marker_color = staticmaps.RED
+            marker_color = "marker_graphics/red_marker.png"
         case 'Float':
-            marker_color = staticmaps.YELLOW
+            marker_color = "marker_graphics/yellow_marker.png"
         case 'Fix':
-            marker_color = staticmaps.GREEN
+            marker_color = "marker_graphics/green_marker.png"
     
     # Add marker to map
-    context.add_object(staticmaps.Marker(location, color=marker_color, size=5))
+    context.add_object(staticmaps.ImageMarker(location, marker_color, 8, 8))
 
 # Find out and set bounds for map
 min_lat = min(coords, key= lambda x:x[0])[0]
