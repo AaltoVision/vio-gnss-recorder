@@ -38,7 +38,7 @@ with open("coords.txt") as file:
         entry = (lat, lon, rtk)
         coords.append(entry)
 
-### Render the map using OpenStreetMap
+### Initialize and render the map using OpenStreetMap
 ### https://github.com/flopp/py-staticmaps/tree/master like in this example
 
 context = staticmaps.Context()
@@ -59,6 +59,33 @@ for point in coords:
     
     # Add marker to map
     context.add_object(staticmaps.Marker(location, color=marker_color, size=5))
+
+# Find out and set bounds for map
+min_lat = min(coords, key= lambda x:x[0])[0]
+max_lat = max(coords, key= lambda x:x[0])[0]
+min_lon = min(coords, key= lambda x:x[1])[1]
+max_lon = max(coords, key= lambda x:x[1])[1]
+
+W = 0.0027  # You cannot pass too small bounds to add_bounds. These are the min. width and height of the tile bounds
+H = 0.0027
+
+w = max_lon - min_lon   # Current measures of the box
+h = max_lat - min_lat
+
+# If current bounds are too small, increase them to fulfill the requirements. The constant 0.00..01 is there so that float-point arithmetics/rounding
+#                                                                             don't bump the values smaller than the requirement.
+
+if w < W:
+    diff = W-w
+    min_lon -= (diff/2 + 0.0001)
+    max_lon += (diff/2 + 0.0001)
+
+if h < H:
+    diff = H-h
+    min_lat -= (diff/2 + 0.0001)
+    max_lat += (diff/2 + 0.0001)
+
+context.add_bounds(staticmaps.parse_latlngs2rect(f"{min_lat},{min_lon} {max_lat},{max_lon}"))
 
 # Render the map
 
