@@ -24,9 +24,12 @@ while True:
 
 ### Parse the .txt file
 
-filter = r'Global position: ([\d.]+), ([\d.]+); RTK solution: (\w+)'
-
-with open("coords.txt") as file:
+#filter = r'Global position: ([\d.]+), ([\d.]+); RTK solution: (\w+)'
+#filter = r'\{"latitude":\s*(-?\d+\.\d+),\s*"longitude":\s*(-?\d+\.\d+),\s*.*?"fixSolution":\s*"([^"]+)"\}'
+filter = r'.*"latitude":(-?\d+\.\d+),"longitude":(-?\d+\.\d+).*$'
+#with open("coords.txt") as file:
+#with open ("coords_NEW_VERSION_oikeustalo.txt") as file:
+with open ("coords_pose_0_01.txt") as file:
     entries = file.readlines()
     for i in entries:
         if re.match(filter, i) == None:   # Hop over the lines where VIO and GNSS haven't synced and anything that regex doesn't find a match in
@@ -34,7 +37,8 @@ with open("coords.txt") as file:
         valid_entry = re.match(filter, i)
         lat = float(valid_entry.group(1))
         lon = float(valid_entry.group(2))
-        rtk = valid_entry.group(3)
+        #rtk = valid_entry.group(3)
+        rtk = "None"
         entry = (lat, lon, rtk)
         coords.append(entry)
 
@@ -46,6 +50,7 @@ context.set_tile_provider(staticmaps.tile_provider_OSM)
 
 # vio_gnss.py outputs data points so frequently that we can pick every 100th for map markers
 for point in coords[::100]:
+#for point in coords:
 
     location = staticmaps.create_latlng(point[0], point[1])   # Create LatLng object (coordinate point)
 
