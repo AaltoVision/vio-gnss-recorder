@@ -30,7 +30,7 @@ Example map (OpenStreetMap):
 
 This software should be setup and ran inside a Python virtual environment to avoid any conflicts.
 <details open>
-<summary>Virtual environments with Python.</summary>
+<summary>Virtual environments in Python.</summary>
  
 ```bash
 pip install virtualenv
