@@ -21,15 +21,15 @@ The purpose of this software is to alleviate collecting and analyzing large data
 * A map showing the travelled route is rendered. The route is determined after Sensor Fusion in the pipe which means that the route should attain a satisfactory accuracy even when temporarily travelling in a GPS dead zone.
 * The map indicates the state of the RTK solution (None, Float, Fix) with colored markers. *RTK Fix solution usually corresponds to an accuracy of only few centimeters.*[^rtk]
 * **TODO:** At the moment, the script utilizes the real-time location output of the system to render the map. This means that **SLAM** won't correct the rendered route 'in the past'. A functionality could be added so that the map renderer can take SLAM's corrections into account.
-
-Example map (OpenStreetMap):                                 
-<img src="/assets/images/map_test.png" width="400" alt="Example Map" title="Otaniemi, Espoo, Finland"/>
+                      
+<p align="center"><img src="/assets/images/map_test.png" width="400" alt="Example Map" title="Otaniemi, Espoo, Finland"/>
+<br><em>Example map output (tile provided by OpenStreetMap)</em></p>
 
 ## Setup
 > *It is recommended to test the aforementioned demonstration because this implementation utilizes its components under the hood.*
 
 This software should be setup and ran inside a Python virtual environment to avoid any conflicts.
-<details open>
+<details>
 <summary>Virtual environments in Python.</summary>
  
 ```bash
@@ -49,13 +49,20 @@ Start by cloning this repository.
 git clone https://github.com/AaltoVision/vio_gnss_recorder
 ```
 ### Configure u-blox C099-F9P board
-You'll need to configure the board (instructions in the [PDF](https://github.com/SpectacularAI/docs/blob/main/pdf/GNSS-VIO_OAK-D_Python.pdf)) for which you can use AaltoVision's fork of the `u-blox-capture` repository[^u-blox-repo] because you'll need it later on to communicate with the board.
+You'll need to configure the board (instructions also in the [PDF](https://github.com/SpectacularAI/docs/blob/main/pdf/GNSS-VIO_OAK-D_Python.pdf)). Clone AaltoVision's fork of the `u-blox-capture` repository[^u-blox-repo].
 ```bash
 git clone https://github.com/AaltoVision/u-blox-capture --recurse-submodules
 ```
+Navigate to your local copy of the repository.
+```bash
+# for temporary configuration
+python ubx_configurator.py DEVICE_PATH example/high_precision_gps_only.cfg
+# for permament configuration
+python ubx_configurator.py DEVICE_PATH -flash example/high_precision_gps_only.cfg
+```
 
 If the board configuration is not flashed permamently, the configuration has to be done prior to running `vio_gnss_recorder.py` so after every reconnection or reboot.
-**Important:** `vio_gnss_recorder.py` **does not configure the board automatically.**
+**Important: `vio_gnss_recorder.py` does not configure the board automatically.**
 
 After cloning `u-blox-capture` you'll need to build `str2str`
 ```bash
@@ -63,13 +70,29 @@ cd RTKLIB/app/str2str/gcc/
 make
 ```
 ### Dependencies
-After activating your virtual environment, install all the packages with `pip`
+After activating your virtual environment, install all the necessary packages with `pip`
 ```bash
 pip install -r requirements.txt
 ```
-### RTK/NTRIP configuration
-**TODO**
+### Modify `config.ini`
+There's a configuration file `config.ini` in the parent directory. The absolute paths to the cloned repositories must be provided there so that `vio_gnss_recorder.py` can use them.
+Also the device path must be disclosed. The path is usually `/dev/ttyACM0` but the user can define the path in the case that they have other peripherals in their setup. It should be considered that the number (<code>/dev/ttyACM<b>0</b></code>) increments between reconnections of the module so if the board needs to be disconnected momentarily the user must either modify the config file or reboot the OS.
+
+## Usage
+The workflow for using this automatisation:
+1. **Record the data**: `python vio_gnss_recorder.py`
+   - You might need sudo rights to communicate with OAK-D in your setup. Either modify udev rules accordingly or use  
+     `sudo env "PATH=$PATH" python vio_gnss_recorder.py`
+   - The board has an yellow LED which indicates the RTK solution's state:
+       - Off: None
+       - Blinking: Float
+       - On: Fix
+   - After acquiring a stable RTK Fix, you should move to align the trajectories. The dataset should be collected after the script starts outputting the global position.
+   - `Ctrl+C` to stop the program. The dataset is saved in a `session<timestamp>` folder. Locational data points for rendering the map are saved in `coords.txt`.
+2. **Render the map**: `python render_map.py`
+   - Renders a map of the traversed route using data points parsed from `coords.txt`.
+   - Asks the user to type some kind of an identifier (eg. `Otaniemi_14_8_2023`) for the .png to be created.
 
 [^pdf]: https://github.com/SpectacularAI/docs/blob/main/pdf/GNSS-VIO_OAK-D_Python.pdf — © Spectacular AI
 [^rtk]: https://sciencing.com/difference-between-rtk-fix-rtk-float-12245568.html
-[^u-blox-repo]: https://github.com/AaltoML/u-blox-capture
+[^u-blox-repo]: https://github.com/AaltoML/u-blox-capture and https://github.com/SpectacularAI/u-blox-capture
