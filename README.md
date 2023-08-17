@@ -20,7 +20,7 @@ The purpose of this software is to alleviate collecting and analyzing large data
 ## Map
 * A map showing the travelled route is rendered. The route is determined after Sensor Fusion in the pipe which means that the route should attain a satisfactory accuracy even when temporarily travelling in a GPS dead zone.
 * The map indicates the state of the RTK solution (None, Float, Fix) with colored markers. *RTK Fix solution usually corresponds to an accuracy of only few centimeters.*[^rtk]
-* **TODO:** At the moment, the script utilizes the real-time location output of the system to render the map. This means that **SLAM** won't correct the rendered route 'in the past'. A functionality could be added so that the map renderer can take SLAM's corrections into account.
+* **TODO:** At the moment, the script utilizes the real-time location output of the system to render the map. This means that [SLAM](https://en.wikipedia.org/wiki/Simultaneous_localization_and_mapping) won't correct the rendered route 'in the past'. A functionality could be added so that the map renderer can take SLAM's corrections into account.
                       
 <p align="center"><img src="/assets/images/map_test.png" width="400" alt="Example Map" title="Otaniemi, Espoo, Finland"/>
 <br><em>Example map output (tile provided by OpenStreetMap)</em></p>
