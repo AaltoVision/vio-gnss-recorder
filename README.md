@@ -1,10 +1,15 @@
 # VIO-GNSS Recorder
 Automatisation of [SpectacularAI's GNSS + VIO demo](https://github.com/SpectacularAI/docs/blob/main/pdf/GNSS-VIO_OAK-D_Python.pdf). Including some added functionalities to make collecting data easier.
-The purpose of this software is to alleviate collecting and analyzing large datasets with SpectacularAI's GNSS-VIO Fusion implementation.
+The purpose of this software is to alleviate collecting and analyzing large datasets with SpectacularAI's GNSS-VIO Fusion implementation.  
+
+If you have access to a 3D printer, you can use the models provided in [`/3D_print`](/3D_print) to print a casing which makes it easier to collect datasets.
+
 > #### Necessary hardware[^pdf]:
 > - u-blox C099-F9P board + ANN-MB-00 antenna
 > - Luxonis OAK-D camera
 > - Laptop running Linux
+>
+> Take to account that the antenna likely needs a [ground plane](https://www.electronics-notes.com/articles/antennas-propagation/grounding-earthing/antenna-ground-plane-theory-design.php) to work properly. In our setup a thin circular plane of aluminium worked perfectly fine. The antenna can also be mounted on a car for this purpose.
 
 ## Automatisation
 * The script `vio_gnss_recorder.py` asks the user to input some basic information like the authentication credentials for a RTK provider + the user's approximate location.
