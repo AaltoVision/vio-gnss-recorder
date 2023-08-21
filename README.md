@@ -49,9 +49,10 @@ deactivate
 
 </details>
 
-Start by cloning this repository.
+Start by cloning these repositories.
 ```bash
 git clone https://github.com/AaltoVision/vio_gnss_recorder
+git clone https://github.com/AaltoVision/sdk-examples
 ```
 ### Configure u-blox C099-F9P board
 You'll need to configure the board (instructions also in the [PDF](https://github.com/SpectacularAI/docs/blob/main/pdf/GNSS-VIO_OAK-D_Python.pdf)). Clone AaltoVision's fork of the `u-blox-capture` repository[^u-blox-repo].
