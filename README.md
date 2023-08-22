@@ -51,7 +51,7 @@ deactivate
 
 Start by cloning these repositories.
 ```bash
-git clone https://github.com/AaltoVision/vio_gnss_recorder
+git clone https://github.com/AaltoVision/vio-gnss-recorder
 git clone https://github.com/AaltoVision/sdk-examples
 ```
 ### Configure u-blox C099-F9P board
