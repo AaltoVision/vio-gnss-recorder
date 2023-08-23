@@ -99,6 +99,9 @@ The workflow for using this automatisation:
    - Renders a map of the traversed route using data points parsed from `coords.txt`.
    - Asks the user to type some kind of an identifier (eg. `Otaniemi_14_8_2023`) for the .png to be created.
 
+## License
+This software is published under the [MIT License](https://opensource.org/license/mit/). Refer to the file LICENSE for more information.
+
 [^pdf]: https://github.com/SpectacularAI/docs/blob/main/pdf/GNSS-VIO_OAK-D_Python.pdf — © Spectacular AI
 [^rtk]: https://sciencing.com/difference-between-rtk-fix-rtk-float-12245568.html
 [^u-blox-repo]: https://github.com/AaltoML/u-blox-capture and https://github.com/SpectacularAI/u-blox-capture
